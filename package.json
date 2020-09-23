@@ -79,9 +79,6 @@
     "README.md"
   ],
   "ava": {
-    "require": [
-      "./test/_setup-browser-env.js"
-    ],
     "failFast": true,
     "timeout": "60s",
     "typescript": {
