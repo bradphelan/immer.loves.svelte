@@ -66,10 +66,14 @@
 					<h1>immer-loves-svelte</h1>
 				</a>
 				<p>Create writable sub stores from primary stores using a simple selector syntax</p>
+				<p><a href="https://bradphelan.github.io/immer.loves.svelte">HomePage</a></p>
 				<p><code>childStore = subStore(mainStore, root =&gt; a.b.c[&quot;foo&quot;].q.r.really.but.it.still.works)</code></p>
 				<p>Under the hood it is all immer and custom svelte stores.</p>
 				<p>For example </p>
-				<pre><code><span class="hljs-keyword">type</span> Foo = {
+				<pre><code>
+<span class="hljs-keyword">import</span> {subStore} <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;immer-loves-svelte&quot;</span>
+
+<span class="hljs-keyword">type</span> Foo = {
   <span class="hljs-keyword">readonly</span> a: <span class="hljs-built_in">number</span>;
   <span class="hljs-keyword">readonly</span> b: <span class="hljs-built_in">string</span>;
 };
