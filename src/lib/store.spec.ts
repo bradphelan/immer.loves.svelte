@@ -1,7 +1,10 @@
+/* eslint-disable functional/immutable-data */
 import test from 'ava';
+import { produce } from "immer"
 import { writable } from 'svelte/store';
 
 import { lens as subStore } from './subStore';
+
 
 type Foo = {
   readonly a: number;
@@ -57,4 +60,20 @@ test('creating a subStore for non leaf path works', (t) => {
   });
   s.set([{ a: 11, b: 'horse' }]);
   t.deepEqual(result.foo3, [{ a: 11, b: 'horse' }]);
+});
+
+test('subscribe for sub stores works', (t) => {
+  // eslint-disable-next-line functional/no-let
+  let result: number = null;
+  const barStore = writable(bar);
+
+  const s0 = subStore(barStore, (b) => b.foo1.a);
+  s0.subscribe((v: number) => {
+    result = v;
+  });
+
+  const s1 = subStore(barStore, (b) => b.foo1);
+  s1.update((v:Foo)=>produce(v,d=>{d.a=99}))
+
+  t.deepEqual(result, 99);
 });
