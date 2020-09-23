@@ -1,1 +1,1 @@
-export * from './lib/subStore';
+export {subStore} from './lib/subStore';

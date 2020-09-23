@@ -3,7 +3,7 @@ import test from 'ava';
 import { produce } from "immer"
 import { writable } from 'svelte/store';
 
-import { lens as subStore } from './subStore';
+import { subStore } from './subStore';
 
 
 type Foo = {

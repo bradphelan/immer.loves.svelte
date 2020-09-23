@@ -39,7 +39,7 @@ const makeUpdateProxy = <T, U>(
 
 type Updater<T> = (arg0: T) => T;
 
-export function lens<T, U>(
+export function subStore<T, U>(
   store: Writable<T>,
   selector: (r: T) => U
 ): Writable<U> {
