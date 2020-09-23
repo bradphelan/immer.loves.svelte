@@ -2,6 +2,8 @@
 
 Create writable sub stores from primary stores using a simple selector syntax
 
+[HomePage](https://bradphelan.github.io/immer.loves.svelte)
+
 ```childStore = subStore(mainStore, root => a.b.c["foo"].q.r.really.but.it.still.works)```
 
 Under the hood it is all immer and custom svelte stores.
@@ -10,6 +12,9 @@ Under the hood it is all immer and custom svelte stores.
 For example 
 
 ```
+
+import {subStore} from "immer-loves-svelte"
+
 type Foo = {
   readonly a: number;
   readonly b: string;
