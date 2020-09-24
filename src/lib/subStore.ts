@@ -7,10 +7,13 @@ import { Writable } from 'svelte/store';
 
 type Updatable<T> = {
   readonly __update__: (r: T) => Nothing;
-};
+} & T;
 
-// eslint-disable-next-line @typescript-eslint/no-empty-function
-function sink(_v: any) {}
+/* eslint-disable @typescript-eslint/no-empty-function */
+/* eslint-disable @typescript-eslint/no-unused-vars */
+function sink(_v: unknown) {}
+/* eslint-enable @typescript-eslint/no-unused-vars */
+/* eslint-enable @typescript-eslint/no-empty-function */
 
 // An empty object to use
 const empty = {}
@@ -19,7 +22,7 @@ const empty = {}
 function makeUpdateProxyImpl<T extends object>(
   obj: T,
   update: (r: T) => void = sink
-): T 
+): Updatable<T> 
 {
   const handler = {
     get: (target: T, prop: string|number) => {
@@ -31,7 +34,7 @@ function makeUpdateProxyImpl<T extends object>(
       else return makeUpdateProxyImpl(empty, (v) => (target[prop] = v));
     },
   };
-  return new Proxy<T>(obj, handler);
+  return new Proxy<Updatable<T>>(<Updatable<T>>obj, handler);
 }
 
 // eslint-disable-next-line @typescript-eslint/ban-types
@@ -39,8 +42,14 @@ const makeUpdateProxy = <T extends object, U>(
   target: T,
   selector: (r: T) => U
 ): ((r: U) => void) => {
-  const u = <Updatable<U>>(<unknown>selector(makeUpdateProxyImpl(target)));
+
+  // Pass the proxied target through the selector to generate a
+  // setter for the subfield 
+  const u = <Updatable<U>> <unknown> selector(makeUpdateProxyImpl(target));
+
+  // Return a function to perform the update
   return (r: U) => u.__update__(r);
+
 };
 
 type Updater<T> = (arg0: T) => T;

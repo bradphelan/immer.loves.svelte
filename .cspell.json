@@ -16,14 +16,15 @@
         "exponentiate",
         "globby",
         "immer",
+        "immerjs",
         "libauth",
         "mkdir",
         "prettierignore",
+        "proxied",
         "sandboxed",
         "transpiled",
         "typedoc",
-        "untracked",
-        "immerjs"
+        "untracked"
     ],
     "flagWords": [],
     "ignorePaths": [
