@@ -9,29 +9,25 @@ type Updatable<T> = {
   readonly __update__: (r: T) => Nothing;
 } & T;
 
-/* eslint-disable @typescript-eslint/no-empty-function */
-/* eslint-disable @typescript-eslint/no-unused-vars */
-function sink(_v: unknown) {}
-/* eslint-enable @typescript-eslint/no-unused-vars */
-/* eslint-enable @typescript-eslint/no-empty-function */
-
 // An empty object to use
 const empty = {}
+const noprop = ""
 
 // eslint-disable-next-line @typescript-eslint/ban-types
-function makeUpdateProxyImpl<T extends object>(
+function makeUpdateProxyImpl<T extends object, P extends object>(
   obj: T,
-  update: (r: T) => void = sink
+  parent: P,
+  parentProp: string|number
 ): Updatable<T> 
 {
   const handler = {
     get: (target: T, prop: string|number) => {
-      if (prop === '__update__') return update;
-
+      if (prop === '__update__') 
+        return ((r:T)=>parent[parentProp]=r)
       const newTarget = target[prop];
       if (isDraft(newTarget))
-        return makeUpdateProxyImpl( target[prop], (v) => (target[prop] = v));
-      else return makeUpdateProxyImpl(empty, (v) => (target[prop] = v));
+        return makeUpdateProxyImpl( newTarget, target, prop);
+      else return makeUpdateProxyImpl(empty, target, prop);
     },
   };
   return new Proxy<Updatable<T>>(<Updatable<T>>obj, handler);
@@ -45,7 +41,7 @@ const makeUpdateProxy = <T extends object, U>(
 
   // Pass the proxied target through the selector to generate a
   // setter for the subfield 
-  const u = <Updatable<U>> <unknown> selector(makeUpdateProxyImpl(target));
+  const u = <Updatable<U>> <unknown> selector(makeUpdateProxyImpl(target, empty, noprop));
 
   // Return a function to perform the update
   return (r: U) => u.__update__(r);
