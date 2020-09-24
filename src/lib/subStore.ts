@@ -6,7 +6,10 @@ import { Nothing } from 'immer/dist/internal';
 import { Writable } from 'svelte/store';
 
 type Updatable<T> = {
-  readonly __update__: (r: T) => Nothing;
+  // Use a stupid name for the update method extension to avoid name collisions.
+  // Is there a better way. String interning in JS should mean that a long
+  // string does not mean a long time for a positive match.
+  readonly __immer_loves_svelte_update__: (r: T) => Nothing;
 } & T;
 
 // An empty object to use
@@ -18,11 +21,13 @@ function makeUpdateProxyImpl<T extends object, P extends object>(
   obj: T,
   parent: P,
   parentProp: string|number
-): Updatable<T> 
+) 
 {
   const handler = {
-    get: (target: T, prop: string|number) => {
-      if (prop === '__update__') 
+    get (target: T, prop: string|number)
+    {
+      // 
+      if (prop === '__immer_loves_svelte_update__') 
         return ((r:T)=>parent[parentProp]=r)
       const newTarget = target[prop];
       if (isDraft(newTarget))
@@ -30,7 +35,7 @@ function makeUpdateProxyImpl<T extends object, P extends object>(
       else return makeUpdateProxyImpl(empty, target, prop);
     },
   };
-  return new Proxy<Updatable<T>>(<Updatable<T>>obj, handler);
+  return new Proxy(obj, handler);
 }
 
 // eslint-disable-next-line @typescript-eslint/ban-types
@@ -44,7 +49,7 @@ const makeUpdateProxy = <T extends object, U>(
   const u = <Updatable<U>> <unknown> selector(makeUpdateProxyImpl(target, empty, noprop));
 
   // Return a function to perform the update
-  return (r: U) => u.__update__(r);
+  return (r: U) => u.__immer_loves_svelte_update__(r);
 
 };
 
