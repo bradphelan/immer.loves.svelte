@@ -1,3 +1,3 @@
 export {subStore} from './lib/subStore';
-export {undoStore} from './lib/undoStore';
-export {transactionStore} from './lib/transactionStore';
+export {undoStore, UndoRedoStore} from './lib/undoStore';
+export {transactionStore, TransactionStore} from './lib/transactionStore';
