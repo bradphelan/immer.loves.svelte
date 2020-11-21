@@ -6,6 +6,9 @@ A library of svelte store wrappers
 - **undoStore** Wrap any store with undo redo features
 - **transactionStore** Wrap any store with validation and transactions
 
+A live example of subStore and undoStore
+https://svelte.dev/repl/4434d8fcd12242d79887343fd95e429c?version=3.29.7
+
 [HomePage](https://bradphelan.github.io/immer.loves.svelte)
 
 subStore
