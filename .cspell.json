@@ -9,5 +9,11 @@
         "yarn.lock",
         "tsconfig.json",
         "node_modules/**"
+    ],
+    "words": [
+        "sort",
+        "sort store",
+        "store",
+        "Substore"
     ]
 }

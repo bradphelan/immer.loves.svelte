@@ -55,7 +55,7 @@ const makeUpdateProxy = <T extends object, U>(
 
 type Updater<T> = (arg0: T) => T;
 
-type Substore<T> = Writable<T> & {
+export type Substore<T> = Writable<T> & {
   readonly errors: Readable<unknown>
 };
 

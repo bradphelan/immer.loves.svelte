@@ -5,9 +5,10 @@ A library of svelte store wrappers
 - **subStore** Create views on to leaf stores using arrow functions to specify the scope. Uses immer js under the hood.
 - **undoStore** Wrap any store with undo redo features
 - **transactionStore** Wrap any store with validation and transactions
+- **sortStore** provides a sorted array of writable stores given a single store input for root 
 
 [A live example of subStore and undoStore](https://svelte.dev/repl/4434d8fcd12242d79887343fd95e429c?version=3.29.7)
-
+[ A live example of sorting](https://svelte.dev/repl/54f428bdfc324fe39a67b1345c7bc742?version=3.29.7)
 
 [HomePage](https://bradphelan.github.io/immer.loves.svelte)
 
