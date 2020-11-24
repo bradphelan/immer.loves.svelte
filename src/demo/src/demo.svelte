@@ -1,37 +1,40 @@
 <script>
-	// small hack to get immerjs working.
-	window.process = {
-		env: {
-			NODE_ENV: "production"
-		}
-	};
-	
-	import { flip } from 'svelte/animate';
-	import {writable,get,derived} from 'svelte/store'
-	import {people, newPerson} from "./data"
-	import {subStore,sortStore} from "immer-loves-svelte"
-	import Widget from "./Widget.svelte"
-	import _ from "underscore"
-	import {produce} from "immer"
+  // small hack to get immerjs working.
+  window.process = {
+    env: {
+      NODE_ENV: 'production',
+    },
+  };
 
-	// Create a root store for the whole application
-	let rootStore = writable(people)
-	
-    const sortedStore = sortStore(rootStore, s=>s.age)
-	
-	let add = ev => {
-		rootStore.update(v=>produce(v,draft=>{
-			let p = newPerson()
-			draft[p.id]=p
-		}))
-	}
-	
-	let remove = id => {
-		rootStore.update(v=>produce(v,draft=>{
-			delete draft[id]
-		}))
-	}
+  import { flip } from 'svelte/animate';
+  import { writable, get, derived } from 'svelte/store';
+  import { people, newPerson } from './data';
+  import { subStore, sortStore } from 'immer-loves-svelte@2.1.2';
+  import Widget from './Widget.svelte';
+  import _ from 'underscore';
+  import { produce } from 'immer';
 
+  // Create a root store for the whole application
+  let rootStore = writable(people);
+
+  const sortedStore = sortStore(rootStore, (s) => s.age);
+
+  let add = (ev) => {
+    rootStore.update((v) =>
+      produce(v, (draft) => {
+        let p = newPerson();
+        draft[p.id] = p;
+      })
+    );
+  };
+
+  let remove = (id) => {
+    rootStore.update((v) =>
+      produce(v, (draft) => {
+        delete draft[id];
+      })
+    );
+  };
 </script>
 
 <style>

@@ -10,6 +10,7 @@ type Updatable<T> = {
   // Is there a better way. String interning in JS should mean that a long
   // string does not mean a long time for a positive match.
   readonly __immer_loves_svelte_update__: (r: T) => Nothing;
+  readonly __immer_loves_svelte_del__: () => Nothing;
 } & T;
 
 // An empty object to use
@@ -26,13 +27,33 @@ function makeUpdateProxyImpl<T extends object, P extends object>(
   const handler = {
     get (target: T, prop: string|number)
     {
-      // 
       if (prop === '__immer_loves_svelte_update__') 
         return ((r:T)=>parent[parentProp]=r)
       const newTarget = target[prop];
       if (isDraft(newTarget))
         return makeUpdateProxyImpl( newTarget, target, prop);
       else return makeUpdateProxyImpl(empty, target, prop);
+    },
+  };
+  return new Proxy(obj, handler);
+}
+
+// eslint-disable-next-line @typescript-eslint/ban-types
+function makeDelProxyImpl<T extends object, P extends object>(
+  obj: T,
+  parent: P,
+  parentProp: string|number
+) 
+{
+  const handler = {
+    get (target: T, prop: string|number)
+    {
+      if (prop === '__immer_loves_svelte_del__') 
+        return (()=>delete parent[parentProp])
+      const newTarget = target[prop];
+      if (isDraft(newTarget))
+        return makeDelProxyImpl( newTarget, target, prop);
+      else return makeDelProxyImpl(empty, target, prop);
     },
   };
   return new Proxy(obj, handler);
@@ -53,10 +74,26 @@ const makeUpdateProxy = <T extends object, U>(
 
 };
 
+// eslint-disable-next-line @typescript-eslint/ban-types
+const makeDelProxy = <T extends object, U>(
+  target: T,
+  selector: (r: T) => U
+): (() => void) => {
+
+  // Pass the proxied target through the selector to generate a
+  // deleter for the subfield 
+  const u = <Updatable<U>> <unknown> selector(makeDelProxyImpl(target, empty, noprop));
+
+  // Return a function to perform the delete
+  return () => u.__immer_loves_svelte_del__(); 
+
+};
+
 type Updater<T> = (arg0: T) => T;
 
 export type Substore<T> = Writable<T> & {
   readonly errors: Readable<unknown>
+  readonly delete: ()=>void
 };
 
 // eslint-disable-next-line @typescript-eslint/ban-types
@@ -71,6 +108,15 @@ export function subStore<T extends object, U>(
     const rootUpdater = (oldValue: T) => {
       return produce(oldValue, (ds: T) => {
         makeUpdateProxy(ds, selector)(u);
+      });
+    };
+    update(rootUpdater);
+  }
+
+  function subDel(): void {
+    const rootUpdater = (oldValue: T) => {
+      return produce(oldValue, (ds: T) => {
+        makeDelProxy(ds, selector)();
       });
     };
     update(rootUpdater);
@@ -96,6 +142,7 @@ export function subStore<T extends object, U>(
     } ),
     set: subSet,
     update: subUpdate,
-    errors: errors
+    errors: errors,
+    delete: subDel 
   };
 }

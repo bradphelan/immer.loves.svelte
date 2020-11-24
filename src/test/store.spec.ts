@@ -1,9 +1,14 @@
 /* eslint-disable functional/immutable-data */
 import test from 'ava';
-import { produce } from "immer"
-import { writable } from 'svelte/store';
+import {  produce } from "immer"
+import { get as getFromStore,Readable, writable } from 'svelte/store';
 
 import { subStore } from '../lib/subStore';
+
+
+function get<T>(store: Readable<T>) {
+  return getFromStore(store) as T;
+}
 
 
 type Foo = {
@@ -77,3 +82,12 @@ test('subscribe for sub stores works', (t) => {
 
   t.deepEqual(result, 99);
 });
+
+test('deleting a substore removes the node', (t)=>{
+  const barStore = writable(bar);
+  const fooStore = subStore(barStore, k=>k.foo1)
+  fooStore.delete()
+
+  t.deepEqual(get(barStore).foo1,undefined)
+
+})
