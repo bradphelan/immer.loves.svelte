@@ -3,7 +3,7 @@
 
 import { isDraft, produce } from 'immer';
 import { Nothing } from 'immer/dist/internal';
-import { Writable } from 'svelte/store';
+import { Readable,Writable,writable } from 'svelte/store';
 
 type Updatable<T> = {
   // Use a stupid name for the update method extension to avoid name collisions.
@@ -55,12 +55,17 @@ const makeUpdateProxy = <T extends object, U>(
 
 type Updater<T> = (arg0: T) => T;
 
+type Substore<T> = Writable<T> & {
+  readonly errors: Readable<unknown>
+};
+
 // eslint-disable-next-line @typescript-eslint/ban-types
 export function subStore<T extends object, U>(
   store: Writable<T>,
   selector: (r: T) => U
-): Writable<U> {
+): Substore<U> {
   const { subscribe, update } = store;
+  const errors = writable(undefined)
 
   function subSet(u: U): void {
     const rootUpdater = (oldValue: T) => {
@@ -81,8 +86,16 @@ export function subStore<T extends object, U>(
   }
 
   return {
-    subscribe: (subscriber) => subscribe((v) => subscriber(selector(v))),
+    subscribe: (subscriber) => subscribe((v) =>{
+      try {
+        subscriber(selector(v))
+      } catch (error)
+      {
+        errors.set(error)
+      } 
+    } ),
     set: subSet,
     update: subUpdate,
+    errors: errors
   };
 }
