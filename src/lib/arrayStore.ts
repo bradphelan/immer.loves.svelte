@@ -6,7 +6,7 @@ import { derived, Readable, Writable } from "svelte/store";
 
 import { subStore, Substore } from "./subStore";
 
-// Converts a store for a read-only array to a readable store for sub-stores for each element in the array.
+// Converts a store of a read-only array to a readable store of sub-stores for each element in the array.
 // @tparam V the type of record in the array
 export function arrayStore<V>(rootStore: Writable<readonly V[]>)
   : Readable<readonly Substore<V>[]> {
