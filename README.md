@@ -5,20 +5,21 @@ A library of svelte store wrappers
 - **subStore** Create views on to leaf stores using arrow functions to specify the scope. Uses immer js under the hood.
 - **undoStore** Wrap any store with undo redo features
 - **transactionStore** Wrap any store with validation and transactions
-- **sortStore** provides a sorted array of writable stores given a single store input for root 
+- **sortStore** provides a sorted array of writable stores given a single store input for root
+- **arrayStore** converts a store of a read-only array to a readable store of sub-stores for each element in the array.
 
 [A live example of subStore and undoStore](https://svelte.dev/repl/4434d8fcd12242d79887343fd95e429c?version=3.29.7)
 [ A live example of sorting](https://svelte.dev/repl/54f428bdfc324fe39a67b1345c7bc742?version=3.29.7)
 
 [HomePage](https://bradphelan.github.io/immer.loves.svelte)
 
-subStore
-========
-```childStore = subStore(mainStore, root => root.a.b.c["foo"].q.r.really.but.it.still.works)```
+# subStore
+
+`childStore = subStore(mainStore, root => root.a.b.c["foo"].q.r.really.but.it.still.works)`
 
 Under the hood immer and proxy types are used to do the work.
 
-For example 
+For example
 
 ```
 
@@ -52,7 +53,7 @@ test('creating a subStore through object path works', (t) => {
   // create a normal writable store
   const barStore = writable(bar);
 
-  // create a store referencing a sub tree or sub value using just a selector 
+  // create a store referencing a sub tree or sub value using just a selector
   const s = subStore(barStore, b => b.foo1.a);
 
   // collect the results using subscribe
@@ -63,7 +64,7 @@ test('creating a subStore through object path works', (t) => {
   // Set the value using the subStore setter
   s.set(77);
 
-  // Check that the result is correct 
+  // Check that the result is correct
   t.deepEqual(result.foo1.a, 77);
 
 
@@ -71,7 +72,7 @@ test('creating a subStore through object path works', (t) => {
 
 ```
 
-One of the benefits is being able to use ``bind:value`` with immutable stores. For example if you have a store with type
+One of the benefits is being able to use `bind:value` with immutable stores. For example if you have a store with type
 
 ```
 type Data {
@@ -81,7 +82,8 @@ type Data {
 
 let store:Writable<Data>
 ```
-now you can 
+
+now you can
 
 ```
 <script>
@@ -98,12 +100,12 @@ the original store is always updated using **immutable** updates.
 Ideally you defined a single main store for your entire app and then
 distribute subStore views to individual components.
 
-undoStore
-=========
+# undoStore
 
 Wrap any store to provide undo/redo capabilities. Is able to wrap **subStores**.
 
 The provided interface is
+
 ```
 export function undoStore<T>(
   store: Writable<T>,
@@ -118,9 +120,9 @@ export type UndoRedoStore<T> = Writable<T> & {
 };
 ```
 
-transactionStore
-================
-Wrap any store to provide transaction like capabilities with validation. This could be useful when you want to provide updates in a form or dialog with an **ok button**. 
+# transactionStore
+
+Wrap any store to provide transaction like capabilities with validation. This could be useful when you want to provide updates in a form or dialog with an **ok button**.
 
 ```
 export function transactionStore<T>(
