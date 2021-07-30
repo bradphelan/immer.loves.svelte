@@ -15,7 +15,9 @@ A library of svelte store wrappers
 
 # subStore
 
-`childStore = subStore(mainStore, root => root.a.b.c["foo"].q.r.really.but.it.still.works)`
+```js
+childStore = subStore(mainStore, root => root.a.b.c["foo"].q.r.really.but.it.still.works)
+```
 
 Under the hood immer and proxy types are used to do the work.
 
