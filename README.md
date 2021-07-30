@@ -21,7 +21,7 @@ Under the hood immer and proxy types are used to do the work.
 
 For example
 
-```
+```js
 
 import {subStore} from "immer-loves-svelte"
 
@@ -74,7 +74,7 @@ test('creating a subStore through object path works', (t) => {
 
 One of the benefits is being able to use `bind:value` with immutable stores. For example if you have a store with type
 
-```
+```js
 type Data {
   readonly a:string
   readonly b:string
@@ -85,7 +85,7 @@ let store:Writable<Data>
 
 now you can
 
-```
+```html
 <script>
   let aStore = subStore(store,s=>s.a)
   let bStore = subStore(store,s=>s.b)
@@ -106,7 +106,7 @@ Wrap any store to provide undo/redo capabilities. Is able to wrap **subStores**.
 
 The provided interface is
 
-```
+```js
 export function undoStore<T>(
   store: Writable<T>,
 ): UndoRedoStore<T>;
@@ -124,7 +124,7 @@ export type UndoRedoStore<T> = Writable<T> & {
 
 Wrap any store to provide transaction like capabilities with validation. This could be useful when you want to provide updates in a form or dialog with an **ok button**.
 
-```
+```js
 export function transactionStore<T>(
   store: Writable<T>,
   validator:Validator<T> = alwaysValid
