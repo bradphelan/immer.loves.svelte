@@ -1,4 +1,4 @@
-# immer-loves-svelte
+# immer-loves-svelte ( functional lenses over svelte stores )
 
 A library of svelte store wrappers
 
