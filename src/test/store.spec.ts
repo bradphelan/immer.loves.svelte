@@ -1,15 +1,13 @@
 /* eslint-disable functional/immutable-data */
 import test from 'ava';
-import {  produce } from "immer"
-import { get as getFromStore,Readable, writable } from 'svelte/store';
+import { produce } from 'immer';
+import { get as getFromStore, Readable, writable } from 'svelte/store';
 
 import { subStore } from '../lib/subStore';
-
 
 function get<T>(store: Readable<T>) {
   return getFromStore(store) as T;
 }
-
 
 type Foo = {
   readonly a: number;
@@ -78,16 +76,51 @@ test('subscribe for sub stores works', (t) => {
   });
 
   const s1 = subStore(barStore, (b) => b.foo1);
-  s1.update((v:Foo)=>produce(v,d=>{d.a=99}))
+  s1.update((v: Foo) =>
+    produce(v, (d) => {
+      d.a = 99;
+    })
+  );
 
   t.deepEqual(result, 99);
 });
 
-test('deleting a substore removes the node', (t)=>{
+test('deleting a substore removes the node', (t) => {
   const barStore = writable(bar);
-  const fooStore = subStore(barStore, k=>k.foo1)
-  fooStore.delete()
+  const fooStore = subStore(barStore, (k) => k.foo1);
+  fooStore.delete();
 
-  t.deepEqual(get(barStore).foo1,undefined)
+  t.deepEqual(get(barStore).foo1, undefined);
+});
 
-})
+test('changes on one leaf do not notify on another unrelated leaf', (t) => {
+  const barStore = writable(bar);
+  const foo1Store = subStore(barStore, (k) => k.foo1.a);
+  const foo2Store = subStore(barStore, (k) => k.foo2.a);
+  // eslint-disable-next-line functional/no-let
+  let count = 0;
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  foo1Store.subscribe((_v: number) => {
+    count++;
+  });
+  t.deepEqual(count,1);
+  
+  foo2Store.update((v:number)=>v+1);
+  t.deepEqual(count,1);
+});
+
+test('changes on one branch do not notify on another branch leaf', (t) => {
+  const barStore = writable(bar);
+  const foo1Store = subStore(barStore, (k) => k.foo1.a);
+  const foo2Store = subStore(barStore, (k) => k.foo2);
+  // eslint-disable-next-line functional/no-let
+  let count = 0;
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  foo1Store.subscribe((_v: number) => {
+    count++;
+  });
+  t.deepEqual(count,1);
+  
+  foo2Store.update((v:Foo)=>produce(v, vs=>{vs.a=vs.a+1}));
+  t.deepEqual(count,1);
+});

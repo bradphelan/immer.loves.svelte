@@ -132,17 +132,25 @@ export function subStore<T extends object, U>(
   }
 
   return {
-    subscribe: (subscriber) => subscribe((v) =>{
-      try {
-        subscriber(selector(v))
-      } catch (error)
-      {
-        errors.set(error)
-      } 
-    } ),
+    subscribe: (subscriber) => {
+      // eslint-disable-next-line functional/no-let
+      let old:readonly U[] = [] 
+      return subscribe((v:T) => {
+        try {
+          const newItem:U = selector(v);
+          if(old.length==0||old[0]!==newItem)
+          {
+            subscriber(newItem)
+            old = [newItem];
+          }
+        } catch (error) {
+          errors.set(error);
+        }
+      });
+    },
     set: subSet,
     update: subUpdate,
     errors: errors,
-    delete: subDel 
+    delete: subDel,
   };
 }
