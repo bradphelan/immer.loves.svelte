@@ -6,5 +6,10 @@
   "typescript.enablePromptUseWorkspaceTsdk": true,
   "editor.stickyTabStops": true,
   "editor.tabCompletion": "on",
-  "editor.tabSize": 2
+  "editor.tabSize": 2,
+  "cSpell.words": [
+    "deleter",
+    "noprop",
+    "proxied"
+  ]
 }

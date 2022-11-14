@@ -17,14 +17,17 @@ type Updatable<T> = {
 const empty = {}
 const noprop = ""
 
-function makeUpdateProxyImpl<T extends object, P extends object>(
+type RecordUnknown = Record<symbol, unknown> | { readonly [index:number]:unknown}
+
+function makeUpdateProxyImpl<T extends RecordUnknown, P extends RecordUnknown>(
   obj: T,
   parent: P,
   parentProp: string|symbol
 ) 
 {
   const handler:ProxyHandler<T> = {
-    get (target: T, prop: string|symbol, _reciever:any)
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    get (target: T, prop: string|symbol, _receiver:any)
     {
       if (prop === '__immer_loves_svelte_update__') 
         return ((r:T)=>parent[parentProp]=r)
@@ -37,7 +40,7 @@ function makeUpdateProxyImpl<T extends object, P extends object>(
   return new Proxy(obj, handler);
 }
 
-function makeDelProxyImpl<T extends object, P extends object>(
+function makeDelProxyImpl<T extends RecordUnknown, P extends RecordUnknown>(
   obj: T,
   parent: P,
   parentProp: string|symbol
@@ -57,7 +60,7 @@ function makeDelProxyImpl<T extends object, P extends object>(
   return new Proxy(obj, handler);
 }
 
-const makeUpdateProxy = <T extends object, U>(
+const makeUpdateProxy = <T extends RecordUnknown, U>(
   target: T,
   selector: (r: T) => U
 ): ((r: U) => void) => {
@@ -71,7 +74,7 @@ const makeUpdateProxy = <T extends object, U>(
 
 };
 
-const makeDelProxy = <T extends object, U>(
+const makeDelProxy = <T extends RecordUnknown, U>(
   target: T,
   selector: (r: T) => U
 ): (() => void) => {
@@ -93,7 +96,7 @@ export type Substore<T> = Writable<T> & {
 };
 
  
-export function subStore<T extends object, U>(
+export function subStore<T extends RecordUnknown, U>(
   store: Writable<T>,
   selector: (r: T) => U
 ): Substore<U> {
