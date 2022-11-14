@@ -1,16 +1,16 @@
 /* eslint-disable functional/no-return-void */
 /* eslint-disable functional/immutable-data */
 
-import { isDraft, produce } from 'immer';
-import { Nothing } from 'immer/dist/internal';
+import * as immer from 'immer';
+import * as internal from 'immer/dist/internal';
 import { Readable,Writable,writable } from 'svelte/store';
 
 type Updatable<T> = {
   // Use a stupid name for the update method extension to avoid name collisions.
   // Is there a better way. String interning in JS should mean that a long
   // string does not mean a long time for a positive match.
-  readonly __immer_loves_svelte_update__: (r: T) => Nothing;
-  readonly __immer_loves_svelte_del__: () => Nothing;
+  readonly __immer_loves_svelte_update__: (r: T) => internal.Nothing;
+  readonly __immer_loves_svelte_del__: () => internal.Nothing;
 } & T;
 
 // An empty object to use
@@ -27,12 +27,12 @@ function makeUpdateProxyImpl<T extends RecordUnknown, P extends RecordUnknown>(
 {
   const handler:ProxyHandler<T> = {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    get (target: T, prop: string|symbol, _receiver:any)
+    get (target: T, prop: string|symbol, _receiver:unknown)
     {
       if (prop === '__immer_loves_svelte_update__') 
         return ((r:T)=>parent[parentProp]=r)
       const newTarget = target[prop];
-      if (isDraft(newTarget))
+      if (immer.isDraft(newTarget))
         return makeUpdateProxyImpl( newTarget, target, prop);
       else return makeUpdateProxyImpl(empty, target, prop);
     },
@@ -47,12 +47,13 @@ function makeDelProxyImpl<T extends RecordUnknown, P extends RecordUnknown>(
 ) 
 {
   const handler:ProxyHandler<T> = {
-    get (target: T, prop: string|symbol, _receiver:any)
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    get (target: T, prop: string|symbol, _receiver:unknown)
     {
       if (prop === '__immer_loves_svelte_del__') 
         return (()=>delete parent[parentProp])
       const newTarget = target[prop];
-      if (isDraft(newTarget))
+      if (immer.isDraft(newTarget))
         return makeDelProxyImpl( newTarget, target, prop);
       else return makeDelProxyImpl(empty, target, prop);
     },
@@ -105,7 +106,7 @@ export function subStore<T extends RecordUnknown, U>(
 
   function subSet(u: U): void {
     const rootUpdater = (oldValue: T) => {
-      return produce(oldValue, (ds: T) => {
+      return immer.produce(oldValue, (ds: T) => {
         makeUpdateProxy(ds, selector)(u);
       });
     };
@@ -114,7 +115,7 @@ export function subStore<T extends RecordUnknown, U>(
 
   function subDel(): void {
     const rootUpdater = (oldValue: T) => {
-      return produce(oldValue, (ds: T) => {
+      return immer.produce(oldValue, (ds: T) => {
         makeDelProxy(ds, selector)();
       });
     };
@@ -123,7 +124,7 @@ export function subStore<T extends RecordUnknown, U>(
 
   function subUpdate(updater: Updater<U>): void {
     const rootUpdater = (oldValue: T) => {
-      return produce(oldValue, (ds: T) => {
+      return immer.produce(oldValue, (ds: T) => {
         makeUpdateProxy(ds, selector)(updater(selector(oldValue)));
       });
     };
