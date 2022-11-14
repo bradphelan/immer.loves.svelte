@@ -45,33 +45,33 @@
     "node": ">=10"
   },
   "dependencies": {
-    "immer": "^7.0.9",
+    "immer": "^9.0.16",
     "svelte": "^3.26.0",
     "underscore": "^1.12.0"
   },
   "devDependencies": {
-    "@ava/typescript": "^1.1.1",
+    "@ava/typescript": "^3.0.1",
     "@istanbuljs/nyc-config-typescript": "^1.0.1",
     "@types/underscore": "^1.10.24",
-    "@typescript-eslint/eslint-plugin": "^4.0.1",
-    "@typescript-eslint/parser": "^4.0.1",
-    "ava": "^3.12.1",
+    "@typescript-eslint/eslint-plugin": "^5.42.1",
+    "@typescript-eslint/parser": "^5.42.1",
+    "ava": "^5.0.1",
     "browser-env": "^3.3.0",
     "codecov": "^3.5.0",
     "cz-conventional-changelog": "^3.3.0",
-    "eslint": "^7.8.0",
-    "eslint-config-prettier": "^6.11.0",
+    "eslint": "^8.27.0",
+    "eslint-config-prettier": "^8.5.0",
     "eslint-plugin-eslint-comments": "^3.2.0",
-    "eslint-plugin-functional": "^3.0.2",
+    "eslint-plugin-functional": "^4.4.1",
     "eslint-plugin-import": "^2.22.0",
-    "gh-pages": "^3.1.0",
+    "gh-pages": "^4.0.0",
     "npm-run-all": "^4.1.5",
     "nyc": "^15.1.0",
-    "open-cli": "^6.0.1",
+    "open-cli": "^7.1.0",
     "prettier": "^2.1.1",
     "standard-version": "^9.0.0",
-    "ts-node": "^9.0.0",
-    "typedoc": "^0.19.0",
+    "ts-node": "^10.9.1",
+    "typedoc": "^0.23.21",
     "typescript": "^4.0.2"
   },
   "files": [
@@ -89,7 +89,8 @@
     "typescript": {
       "rewritePaths": {
         "src/": "build/main/"
-      }
+      },
+			"compile": false
     },
     "files": [
       "!build/module/**"
@@ -108,5 +109,5 @@
     "exclude": [
       "**/*.spec.js"
     ]
-  }
+	}
 }

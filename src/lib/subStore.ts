@@ -1,5 +1,5 @@
-/* eslint-disable functional/immutable-data */
 /* eslint-disable functional/no-return-void */
+/* eslint-disable functional/immutable-data */
 
 import { isDraft, produce } from 'immer';
 import { Nothing } from 'immer/dist/internal';
@@ -17,15 +17,14 @@ type Updatable<T> = {
 const empty = {}
 const noprop = ""
 
-// eslint-disable-next-line @typescript-eslint/ban-types
 function makeUpdateProxyImpl<T extends object, P extends object>(
   obj: T,
   parent: P,
-  parentProp: string|number
+  parentProp: string|symbol
 ) 
 {
-  const handler = {
-    get (target: T, prop: string|number)
+  const handler:ProxyHandler<T> = {
+    get (target: T, prop: string|symbol, _reciever:any)
     {
       if (prop === '__immer_loves_svelte_update__') 
         return ((r:T)=>parent[parentProp]=r)
@@ -38,15 +37,14 @@ function makeUpdateProxyImpl<T extends object, P extends object>(
   return new Proxy(obj, handler);
 }
 
-// eslint-disable-next-line @typescript-eslint/ban-types
 function makeDelProxyImpl<T extends object, P extends object>(
   obj: T,
   parent: P,
-  parentProp: string|number
+  parentProp: string|symbol
 ) 
 {
-  const handler = {
-    get (target: T, prop: string|number)
+  const handler:ProxyHandler<T> = {
+    get (target: T, prop: string|symbol, _receiver:any)
     {
       if (prop === '__immer_loves_svelte_del__') 
         return (()=>delete parent[parentProp])
@@ -59,7 +57,6 @@ function makeDelProxyImpl<T extends object, P extends object>(
   return new Proxy(obj, handler);
 }
 
-// eslint-disable-next-line @typescript-eslint/ban-types
 const makeUpdateProxy = <T extends object, U>(
   target: T,
   selector: (r: T) => U
@@ -74,7 +71,6 @@ const makeUpdateProxy = <T extends object, U>(
 
 };
 
-// eslint-disable-next-line @typescript-eslint/ban-types
 const makeDelProxy = <T extends object, U>(
   target: T,
   selector: (r: T) => U
@@ -96,7 +92,7 @@ export type Substore<T> = Writable<T> & {
   readonly delete: ()=>void
 };
 
-// eslint-disable-next-line @typescript-eslint/ban-types
+ 
 export function subStore<T extends object, U>(
   store: Writable<T>,
   selector: (r: T) => U

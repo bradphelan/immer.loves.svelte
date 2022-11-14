@@ -1,4 +1,5 @@
 /* eslint-disable functional/no-let */
+/* eslint-disable functional/no-return-void */
 
 import test from 'ava';
 import { get as getFromStore, Readable, writable } from 'svelte/store';
